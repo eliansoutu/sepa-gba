@@ -1,0 +1,428 @@
+---
+title: SEPA cuánto paga
+css: "styles.css"
+format:
+  closeread-html:
+    embed-resources: true
+---
+
+```{r warning=F, echo=F, message=F, results='hide'}
+library(tidyverse)
+library(sf)
+library(ggiraph)
+library(comunicacion)
+
+data <- read_sf("insumos/data_resumen.gpkg")
+total <- read_sf("insumos/total.gpkg")
+cba <- read_rds("insumos/productos_gba.rds")
+marcas <- read_rds("insumos/data_marcas.rds")
+
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+A continuación se analiza el costo de los productos alimenticios en los partidos del Gran Buenos Aires y los barrios de la Ciudad Autónoma de Buenos Aires, a partir de datos del [Sistema Electrónico de Publicidad de Precios Argentinos (SEPA)](https://datos.gob.ar/dataset/produccion-precios-claros---base-sepa).
+
+```{r}
+mapa <- total %>% 
+  ggplot() +
+  geom_sf_interactive(aes(fill = valor_cba,
+ tooltip = paste(nomdepto_censo, "\n", lbl_money(valor_cba, decimales = 0)),                           data_id = nomdepto_censo)) +
+  scale_fill_viridis_c() +
+  theme_void() + labs(fill = "Costo de cubrir productos \nde la CBA (en pesos)")
+  #theme(legend.position = "bottom")
+
+
+girafe_f <- function(plot){
+  girafe(ggobj = plot,
+  width_svg = 7,
+  height_svg = 6,
+  bg = "transparent",
+  options = list(
+  opts_toolbar(
+  hidden = c("lasso_select", "lasso_deselect", "zoom_onoff",
+  "zoom_rect", "zoom_reset", "saveaspng"
+  )
+  ),
+  opts_sizing(rescale = F),
+  opts_tooltip(use_fill = F),
+  opts_hover(css = "stroke:black;stroke-width:1px;")
+))
+}
+```
+
+
+::::{.cr-section}
+
+:::{focus-on="cr-canasta"}
+
+## ¿Cómo nos alimentamos?
+
+El SEPA está integrado por una amplia diversidad de productos y sus precios, declarados por comercios minoristas de todo el país. A fines de este análisis se identificaron aquellos productos que se asimilan a las categorías que conforman la [Canasta Básica Alimentaria (CBA)](https://www.indec.gob.ar/indec/web/Nivel4-Tema-4-43-149) elaborada por el INDEC para el Gran Buenos Aires (GBA).
+:::
+
+::: {#cr-canasta}
+```{r out.width="140%"}
+knitr::include_graphics("insumos/canasta.png")
+```
+::: 
+
+::::
+
+::::{.cr-section}
+
+La CBA es una medida que representa los hábitos de consumo y las necesidades kilocalóricas y proteicas imprescindibles de una persona, tomando como referencia un varón adulto de entre 30 y 60 años, de actividad moderada, durante un mes. <br> Es utilizada para la medición de la pobreza extrema en Argentina. [@cr-cba]
+
+En este sentido, vemos que productos como la leche, el pan, la papa, la carne, las frutas y las hortalizas tienen un peso importante en la alimentación de los argentinos. [@cr-cba-hl]
+
+::: {#cr-cba}
+```{r}
+circles <- cba[[2]] %>% 
+  ggplot() +
+  geom_polygon_interactive(aes(x, y, group = id, tooltip = cba[[1]]$text[id],data_id = id),
+fill = "#0097b2") +
+  geom_text(data = cba[[1]], aes(x, y, label = str_wrap(gsub("Group_", "", producto), 10)), size=2.5, color="white") +
+  coord_equal() +
+  theme_void() +
+  theme(legend.position="none", plot.margin=unit(c(0,0,0,0),"cm"))
+
+girafe_f(circles)
+```
+:::
+
+::: {#cr-cba-hl}
+```{r}
+highlight <- c("Leche","Carnes","Papa","Pan","Hortalizas","Frutas")
+
+circles <- cba[[2]] %>% 
+  ggplot() +
+  geom_polygon_interactive(aes(x, y, group = id, tooltip = cba[[1]]$text[id],data_id = id),
+fill = ifelse(cba[[2]]$id %in% c(1,7,12,13,14,18), "#d6ed64", "grey")) +
+  geom_text(data = cba[[1]] %>% filter(producto %in% highlight), aes(x, y, label = gsub("Group_", "", producto)), size=5, color="black", fontface = "bold") +
+  coord_equal() +
+  theme_void() +
+  theme(legend.position="none", plot.margin=unit(c(0,0,0,0),"cm"))
+
+girafe_f(circles)
+```
+:::
+
+::::
+
+
+::::{.cr-section}
+
+:::{focus-on="cr-cba-mes"}
+
+## ¿Cuánto cuesta alimentarse?
+
+Los datos del SEPA permiten conocer los precios observados de productos que integran las categorías de la CBA. En promedio, en el GBA un adulto necesitó un poco más de `r lbl_money(mean(total$valor_cba))` para alimentarse en el mes de julio 2025.
+
+:::
+
+
+:::{focus-on="cr-cba-mes"}
+
+Cabe mencionar que estos datos difieren de los publicados por INDEC para el cálculo de la inflación, en tanto se utilizan otras fuentes de datos y criterios para su medición.
+
+<br>
+
+Por ejemplo, por falta de representatividad en la base del SEPA, se excluyeron los siguientes productos que integran la CBA: menudencias, otras harinas (maíz), huevos y azúcar.
+
+:::
+
+:::{#cr-cba-mes}
+```{r}
+data_cba_cat <- data %>% 
+st_drop_geometry() %>% 
+summarise(valor_cba = mean(valor_cba), .by = categoria) %>% 
+mutate(categoria = fct_reorder(categoria, valor_cba))
+
+person <- png::readPNG("insumos/adulto.png")
+
+plot_cba_cat <- data_cba_cat %>% 
+ggplot() +
+geom_col_interactive(aes(categoria, valor_cba, tooltip = paste(lbl_money(valor_cba))), fill = "navy") +
+annotation_raster_interactive(person, xmin = .7, xmax = 6,
+ymin = 50000, ymax = 64000, tooltip = "¡Hola! Soy un varón de entre 30 y 60 años y estos son mis <br>consumos alimenticios mensuales aproximados.") +
+coord_flip() +
+theme_minimal() +
+labs(x = "", y = "Valor promedio", title = "Monto destinado a cubrir la CBA por producto")
+
+girafe_f(plot_cba_cat)
+```
+
+:::
+
+::::
+
+::::{.cr-section}
+
+:::{focus-on="cr-cba-hogares"}
+
+**¿Y cuánto le cuesta a una familia alimentarse?** 
+
+Tomando como referencia la composición de los hogares realizada por INDEC, podemos ver el costo de cubrir buena parte de la CBA según precios del SEPA, para distintos hogares.
+
+<br>
+
+- Hogar 1: tres integrantes, compuesto por una mujer de 35 años, su hijo de 18 años y su madre de 61 años.
+
+- Hogar 2: cuatro integrantes, compuesto por un varón de 35 años, una mujer de 31 años, un hijo de 6 años y una hija de 8 años.
+
+- Hogar 3: cinco integrantes, constituido por un varón y una mujer, ambos de 30 años, y tres hijos de 1, 3 y 5 años.
+
+:::
+
+:::{#cr-cba-hogares}
+```{r out.width="150%"}
+# data_hogar <- total %>% 
+# st_drop_geometry() %>% 
+# summarise(adulto = mean(valor_cba)) %>% 
+# mutate("Adulto equivalente" = adulto,
+#        "Hogar 1" = adulto*2.46,
+#        "Hogar 2" = adulto*3.09,
+#        "Hogar 3" = adulto*3.25)
+
+knitr::include_graphics("insumos/hogares.png")
+```
+:::
+
+::::
+
+::::{.cr-section}
+
+:::{focus-on="cr-mapa"}
+
+## ¿Dónde es más caro/barato alimentarse?
+
+Los datos del SEPA permiten analizar la distribución territorial de los precios a lo largo y ancho del GBA.
+
+<br>
+
+<p style="font-size: medium;">*Información correspondiente a un adulto equivalente*.
+</p>
+:::
+
+:::{#cr-mapa}
+```{r}
+girafe_f(mapa)
+```
+:::
+
+
+`r str_to_title(slice_max(total, valor_cba, n = 1)$nomdepto_censo)` arrojó el mayor valor promedio de CBA de acuerdo a los precios relevados [@cr-top]{scale-by="5" pan-to="10%,100%"}
+
+
+Mientras que `r str_to_title(slice_min(total, valor_cba, n = 1)$nomdepto_censo)` registró el menor valor, con una diferencia de `r comunicacion::lbl_money(slice_max(total, valor_cba, n = 1)$valor_cba - slice_min(total, valor_cba, n = 1)$valor_cba)` pesos respecto `r str_to_title(slice_max(total, valor_cba, n = 1)$nomdepto_censo)`. [@cr-top]{scale-by="4" pan-to="100%,-40%"}
+
+Es decir, que en este partido cubrir las necesidades alimentarias es, en promedio, un 22,7% más barato que en el partido más caro. [@cr-top]{scale-by="1"}
+
+
+:::{#cr-top}
+```{r}
+girafe_f(mapa + geom_sf_label_interactive(data = slice_max(total, valor_cba, n = 1),
+aes(label = paste(nomdepto_censo, comunicacion::lbl_money(valor_cba))), 
+hjust = -.5, vjust = -.7,size = 1.5) + geom_sf_label_interactive(data = slice_min(total, valor_cba, n = 1), hjust = 1.2, vjust = 5,
+aes(label = paste(nomdepto_censo, comunicacion::lbl_money(valor_cba))), size = 1.5))
+
+```
+:::
+
+::::
+
+::::{.cr-section}
+
+:::{focus-on="cr-productos-max"}
+
+```{r include=FALSE}
+productos <- data %>% st_drop_geometry() %>%  summarise(precio = mean(precio_unificado), .by = categoria)
+```
+
+## ¿Cuánto me sale cada producto?
+
+El <b style = "color: #d6ed64;">café</b> es el producto más caro de los analizados (si bien su peso en la alimentación es bajo) por amplia diferencia, explicado por la diversidad de marcas (nacionales e importadas) y formas de presentación. En promedio, para el GBA, un kilo de café ronda los `r lbl_money(productos$precio[productos$categoria=="Café"])` pesos.
+
+:::
+
+Por su parte, el producto más barato de la CBA es la <b style = "color: #d6ed64;">harina</b>: `r lbl_money(productos$precio[productos$categoria=="Harina de trigo"])` pesos en promedio por kilo. Le siguen, muy de cerca, la **papa**(`r lbl_money(productos$precio[productos$categoria=="Papa"])`) y la **batata** (`r lbl_money(productos$precio[productos$categoria=="Batata"])`). [@cr-productos-min]
+
+:::{#cr-productos-max}
+```{r}
+plot_productos <- productos %>% 
+mutate(categoria = fct_reorder(categoria, precio)) %>% 
+ggplot() +
+geom_col_interactive(aes(categoria, precio, tooltip = paste(lbl_money(precio),
+ifelse(str_detect(categoria, "Bebidas"), "pesos por lt", "pesos por kg"))), fill = ifelse(productos$categoria == "Café", "#d6ed64", "navy")) +
+coord_flip() +
+theme_minimal() +
+labs(x = "", y = "Precio promedio por kg/lt")
+
+girafe_f(plot_productos)
+```
+:::
+
+
+:::{#cr-productos-min}
+```{r}
+plot_productos <- productos %>% 
+mutate(categoria = fct_reorder(categoria, precio)) %>% 
+ggplot() +
+geom_col_interactive(aes(categoria, precio, tooltip = paste(lbl_money(precio),
+ifelse(str_detect(categoria, "Bebidas"), "pesos por lt", "pesos por kg"))), fill = ifelse(productos$categoria == "Harina de trigo", "#d6ed64", "navy")) +
+coord_flip() +
+theme_minimal() +
+labs(x = "", y = "Precio promedio por kg/lt")
+
+girafe_f(plot_productos)
+```
+:::
+
+::::
+
+```{r}
+# library(crosstalk)
+# library(plotly)
+# 
+# shared_data <- SharedData$new(data, ~ categoria)
+# 
+# bscols(widths = c(12,12),
+#   list(
+#     filter_select("categoria", "Producto", shared_data, ~categoria, multiple = F),
+#    ggplotly(tooltip = "text", ggplot() +
+#      geom_sf(data = shared_data, aes(fill = precio_unificado, group = categoria,
+# text = paste(nomdepto_censo, "\n", lbl_money(precio_unificado, decimales = 0)))) +
+#      scale_fill_viridis_c() +
+#    theme_void() + labs(fill = "Precio por kg")) %>% layout(width = 800,
+#               plot_bgcolor="transparent",
+#                yaxis = list(title = "", fixedrange = TRUE),
+#                xaxis = list(title = "", fixedrange = TRUE),
+#                paper_bgcolor = "transparent")
+#   )
+# )
+```
+
+
+::::{.cr-section}
+
+Al ver la relación entre aporte a la CBA y precio de los productos, vemos una relación del tipo: a mayor peso sobre la canasta, menor precio. [@cr-precios]
+
+:::{#cr-precios}
+```{r}
+data_point <- data %>% 
+st_drop_geometry() %>% 
+summarise(valor_cba = mean(valor_cba),
+          precio_unificado = mean(precio_unificado), .by = categoria) %>% 
+left_join(cba[[1]], by = c("categoria"="producto"))
+
+plot_point <- data_point %>% 
+ggplot() +
+geom_point_interactive(aes(value, precio_unificado, color = categoria, size = valor_cba,
+tooltip = paste(categoria,"\n",ifelse(str_detect(categoria, "Bebidas"), "Precio por litro:", "Precio por kilo:"),lbl_money(precio_unificado),
+"\n", "Cantidad:",unidades,"\n", "Costo total CBA:", lbl_money(valor_cba))),
+show.legend = F)+ 
+labs(x = "Peso", y = "Precio por kg/lt") +
+theme_minimal()
+
+
+girafe_f(plot_point)
+```
+:::
+
+Los productos con mayor peso dentro de la CBA (más de 5 kilos mensuales) presentan precios promedios bajos, mientras que categorías como café y fiambres, cuyo volumen de consumo está por debajo de los 100 gramos, tienen un precio más alto. [@cr-precios-top]
+
+:::{#cr-precios-top}
+```{r}
+data_point <- data %>% 
+st_drop_geometry() %>% 
+summarise(valor_cba = mean(valor_cba),
+          precio_unificado = mean(precio_unificado), .by = categoria) %>% 
+left_join(cba[[1]], by = c("categoria"="producto"))
+
+plot_point <- data_point %>% 
+ggplot() +
+geom_point_interactive(aes(value, precio_unificado, color = categoria, size = valor_cba,
+tooltip = paste(categoria,"\n",ifelse(str_detect(categoria, "Bebidas"), "Precio por litro:", "Precio por kilo:"),lbl_money(precio_unificado),
+"\n", "Cantidad:",unidades,"\n", "Costo total CBA:", lbl_money(valor_cba))),
+show.legend = F)+ 
+labs(x = "Peso", y = "Precio por kg/lt") +
+ gghighlight::gghighlight(value > 5000) +
+theme_minimal()
+
+
+girafe_f(plot_point)
+```
+:::
+
+::::
+
+::::{.cr-section}
+
+:::{focus-on="cr-marcas"}
+
+## ¿Qué productos podemos comprar?
+
+La oferta de productos es diversa, algo que influye en los precios analizados. A mayor variedad de productos (marcas, presentaciones), mayor variabilidad en los precios.
+
+:::
+
+
+:::{#cr-marcas}
+```{r}
+marcas_cat <- read_rds("insumos/marcas_categoria.rds")
+
+marcas_circles <- marcas_cat[[2]] %>% 
+  ggplot() +
+  geom_polygon_interactive(aes(x, y, group = id, tooltip = marcas_cat[[1]]$text[id],data_id = id),
+fill = "#0097b2") +
+  geom_text(data = marcas_cat[[1]], aes(x, y, label = str_wrap(gsub("Group_", "", categoria), 10)), size=2.5, color="white") +
+  coord_equal() +
+  theme_void() +
+  theme(legend.position="none", plot.margin=unit(c(0,0,0,0),"cm"))
+
+girafe_f(marcas_circles)
+```
+:::
+
+Categorías de productos como las <b style = "color: #d6ed64;">bebidas alcoholicas</b> encabezan el ranking de cantidad de marcas que integran el SEPA. Le siguen las <b style = "color: #d6ed64;">galletitas</b> (dulces y saladas) y el <b style = "color: #d6ed64;">queso</b>. [@cr-marcas-hl]
+
+:::{#cr-marcas-hl}
+```{r}
+marcas_cat <- read_rds("insumos/marcas_categoria.rds")
+
+marcas_circles_hl <- marcas_cat[[2]] %>% 
+  ggplot() +
+  geom_polygon_interactive(aes(x, y, group = id, tooltip = marcas_cat[[1]]$text[id],data_id = id),
+                         fill = ifelse(marcas_cat[[2]]$id %in% c(12,13,21), "#d6ed64", "grey")) +
+  geom_text(data = marcas_cat[[1]], aes(x, y, label = str_wrap(gsub("Group_", "", categoria), 10)), size=2.5, color="white") +
+  coord_equal() +
+  theme_void() +
+  theme(legend.position="none", plot.margin=unit(c(0,0,0,0),"cm"))
+
+girafe_f(marcas_circles_hl)
+```
+:::
+::::
+
+::::{.cr-section}
+
+Veamos las zonas donde hay mayor cantidad de opciones de marcas, de acuerdo a los datos registrados en el SEPA. [@cr-marcas-geo]
+
+:::{#cr-marcas-geo}
+```{r}
+mapa_marcas <- marcas[["marcas_barrio"]] %>% 
+left_join(total) %>% st_as_sf() %>% 
+  ggplot() +
+  geom_sf_interactive(aes(fill = marcas,
+ tooltip = paste(nomdepto_censo, "\nMarcas:", lbl_int(marcas)),                           data_id = nomdepto_censo)) +
+  scale_fill_viridis_c(option = "B", begin = .3) +
+  theme_void() + labs(fill = "Cantidad de marcas")
+
+
+girafe_f(mapa_marcas)
+```
+
+:::
+
+::::
+
+Para más información ver pestaña de metodología

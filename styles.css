@@ -1,0 +1,66 @@
+* {
+  font-family: "Exo 2", sans-serif;
+}
+
+a {
+  color: #007574;
+  text-decoration: none;
+}
+
+.navbar {
+  background-color: #007574;
+}
+
+
+.navbar-title, .quarto-navigation-tool, svg.aa-SubmitIcon {
+  color: black !important;
+}
+
+.navbar-nav .nav-link.active {
+    color: #97edd3;
+}
+
+.navbar-nav .nav-link{
+  color: #e8fffd;
+}
+
+.quarto-title {
+  text-align: center !important;
+}
+
+#quarto-content{
+  background-color: #f1fdf6 !important;
+}
+
+
+.cr-section {
+  background-color: #e2f2e9 !important;
+}
+
+.narrative {
+  color: black !important;
+  background-color: #0097b2 !important;
+  border-radius: 15px !important;
+}
+
+
+html {
+  background-color: #e2f2e9 !important;
+}
+
+/*
+#cr-pitch.sticky.cr-active, #cr-goal-spa-0.sticky.cr-active, 
+#cr-xg-evo-0.sticky.cr-active, #cr-xg-evo-5-1.sticky.cr-active {
+  transition: opacity linear 0.5s, color 0.7s linear, transform 1s ease-in-out, transform-origin 1s ease-in-out !important;
+}
+
+.cr-section .sticky-col .sticky-col-stack .cr-active {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.cr-section .sticky-col .sticky-col-stack .sticky {
+  opacity: 0;
+  visibility: hidden;
+}
+*/
