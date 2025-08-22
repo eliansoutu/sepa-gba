@@ -1,0 +1,13 @@
+---
+css: "styles.css"
+format:
+  closeread-html:
+    embed-resources: true
+---
+
+Acá va toda la info metodológica.
+
+```{r}
+knitr::include_graphics("insumos/plot_precio_x_categoria.png")
+```
+

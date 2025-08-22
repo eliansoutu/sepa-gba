@@ -1,5 +1,4 @@
 ---
-title: SEPA cuánto paga
 css: "styles.css"
 format:
   closeread-html:
@@ -16,11 +15,12 @@ data <- read_sf("insumos/data_resumen.gpkg")
 total <- read_sf("insumos/total.gpkg")
 cba <- read_rds("insumos/productos_gba.rds")
 marcas <- read_rds("insumos/data_marcas.rds")
+marcas_cat <- read_rds("insumos/marcas_categoria.rds")
 
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 ```
 
-A continuación se analiza el costo de los productos alimenticios en los partidos del Gran Buenos Aires y los barrios de la Ciudad Autónoma de Buenos Aires, a partir de datos del [Sistema Electrónico de Publicidad de Precios Argentinos (SEPA)](https://datos.gob.ar/dataset/produccion-precios-claros---base-sepa).
+A continuación se analiza el costo de los productos alimenticios en los partidos del Gran Buenos Aires y los barrios de la Ciudad Autónoma de Buenos Aires, a partir de datos del [Sistema Electrónico de Publicidad de Precios Argentinos (SEPA)](https://datos.gob.ar/dataset/produccion-precios-claros---base-sepa){target="_blank"}.
 
 ```{r}
 mapa <- total %>% 
@@ -57,7 +57,7 @@ girafe_f <- function(plot){
 
 ## ¿Cómo nos alimentamos?
 
-El SEPA está integrado por una amplia diversidad de productos y sus precios, declarados por comercios minoristas de todo el país. A fines de este análisis se identificaron aquellos productos que se asimilan a las categorías que conforman la [Canasta Básica Alimentaria (CBA)](https://www.indec.gob.ar/indec/web/Nivel4-Tema-4-43-149) elaborada por el INDEC para el Gran Buenos Aires (GBA).
+El SEPA está integrado por una amplia diversidad de productos y sus precios, declarados por comercios minoristas de todo el país. A fines de este análisis se identificaron aquellos productos que se asimilan a las categorías que conforman la [Canasta Básica Alimentaria (CBA)](https://www.indec.gob.ar/indec/web/Nivel4-Tema-4-43-149){target="_blank"} elaborada por el INDEC para el Gran Buenos Aires (GBA).
 :::
 
 ::: {#cr-canasta}
@@ -387,7 +387,6 @@ Categorías de productos como las <b style = "color: #d6ed64;">bebidas alcoholic
 
 :::{#cr-marcas-hl}
 ```{r}
-marcas_cat <- read_rds("insumos/marcas_categoria.rds")
 
 marcas_circles_hl <- marcas_cat[[2]] %>% 
   ggplot() +
@@ -420,9 +419,43 @@ left_join(total) %>% st_as_sf() %>%
 
 girafe_f(mapa_marcas)
 ```
+:::
 
+Pongamos el foco en los productos que más pesan en la alimentación, de acuerdo a la CBA, y analicemos la conectración de marcas. [@cr-marcas-top]
+
+La leche presenta una mayor diversidad de marcas, asociada a productos para distintas edades (bebés, niños, adultos) y formas de presentación (en polvo, líquida) y [@cr-marcas-top]{scale-by="3.5" pan-to="100%,-60%"}
+
+La Comuna 1, integrada por los barrios de Retiro, San Nicolás, Puerto Madero, San Telmo, Monserrat y Constitución, concetra una gran cantidad de marcas asociadas a este producto. [@cr-marcas-top]{scale-by="9" pan-to="250%,-120%"}
+
+:::{#cr-marcas-top}
+```{r}
+mapa_top_marcas <- marcas[["data_marcas"]] %>% 
+filter(categoria %in% c("Leche","Pan","Papa","Carnes","Hortalizas","Frutas")) %>% 
+left_join(total) %>% st_as_sf() %>% 
+  ggplot() +
+  geom_sf_interactive(aes(fill = marcas,
+ tooltip = paste(nomdepto_censo, "\nMarcas:", lbl_int(marcas), "\nProducto:",categoria),                           data_id = nomdepto_censo), color = "white") +
+  scale_fill_viridis_c(option = "B", begin = .3) +
+  theme_void() + labs(fill = "Cantidad de marcas") + theme(legend.position ="bottom") +
+facet_wrap_interactive(~categoria)
+
+# g <- purrr::map( c("Leche","Pan","Papa","Carnes","Hortalizas","Frutas"),
+#            function(x) {
+#              ggplot() +
+#   geom_sf_interactive(data = filter(marcas[["data_marcas"]] %>% 
+# filter(categoria == x) %>% 
+# left_join(total) %>% st_as_sf()), aes(fill = marcas,
+#  tooltip = paste(nomdepto_censo, "\nMarcas:", lbl_int(marcas)),                           data_id = nomdepto_censo)) +
+#   scale_fill_viridis_c(option = "B", begin = .3) +
+#   theme_void() + labs(title = x, fill = "Cantidad de marcas") + theme(legend.position ="bottom")})
+# 
+# 
+# 
+# g2 <- cowplot::plot_grid(plotlist = g)
+
+girafe_f(mapa_top_marcas)
+```
 :::
 
 ::::
 
-Para más información ver pestaña de metodología
