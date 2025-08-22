@@ -1,5 +1,4 @@
 ---
-css: "styles.css"
 format:
   closeread-html:
     embed-resources: true
