@@ -1,12 +1,114 @@
 ---
+css: "styles.css"
 format:
   closeread-html:
     embed-resources: true
 ---
+```{r  warning=F, echo=F, message=F, results='hide'}
+library(DT)
+library(tidyverse)
+library(ggiraph)
+library(comunicacion)
 
-Acá va toda la info metodológica.
+tabla_productos <- read_rds("insumos/tabla_productos.rds")
+precios_diff <- read_rds("insumos/diff_precios.rds")
 
-```{r}
-knitr::include_graphics("insumos/plot_precio_x_categoria.png")
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 ```
 
+```{r}
+girafe_f <- function(plot){
+  girafe(ggobj = plot,
+  width_svg = 7,
+  height_svg = 6,
+  bg = "transparent",
+  options = list(
+  opts_toolbar(
+  hidden = c("lasso_select", "lasso_deselect", "zoom_onoff",
+  "zoom_rect", "zoom_reset", "saveaspng"
+  )
+  ),
+  opts_sizing(rescale = F),
+  opts_tooltip(use_fill = F),
+  opts_hover(css = "stroke:black;stroke-width:1px;")
+))
+}
+```
+
+## Aclaraciones sobre la información presentada en el análisis
+
+La información de precios analizada corresponde a datos publicados en el portal de datos abiertos para el período del 22 al 31 de julio de 2025. Se descargaron las bases de cada día y se realizó un promedio del período para el cálculo de los precios por producto/barrio.
+
+Los datos analizados, pertenecientes al SEPA, no buscan representar el valor real de la CBA, sino un estudio exploratorio de las diferencias de precios observadas en el territorio, así como la presencia de productos en el mismo. No se debe comparar la información con la publicada por INDEC en tanto:
+
+- Son fuentes de datos y metodologías distintas.
+- No se identificaron algunos productos en la base del SEPA que conforman la CBA: menudencias, otras harinas (maíz), huevos y azúcar.
+- No se tuvieron en cuenta los precios de promociones. Solo se analizó el precio de referencia de los productos.
+- Se unificaron los productos de galletitas, sin distinguir dulces y de agua como lo hace la CBA.
+- La base del SEPA contiene una diversidad de productos (alimenticios y no alimenticios). Si bien se realizó una limpieza exhaustiva, puede contener productos ajenos a aquellos contemplados por la CBA. La categorización de los productos fue realizada de manera *ad hoc*, dado que la base de datos no presenta una columna con la categoría genérica del producto.
+
+A modo de referencia, se presenta a continuación un gráfico que muestra la diferencia de precios promedio por kilo/litro para las categorías de productos, en comparación con lo publicado por INDEC en el [informe de IPC de INDEC (julio 2025)](https://www.indec.gob.ar/uploads/informesdeprensa/ipc_08_25B0A3ACE622.pdf){target="_blank"}:
+
+```{r}
+plot_diff <- precios_diff %>%
+  mutate(categoria = fct_reorder(categoria, diff)) %>% 
+  ggplot(aes(categoria, diff)) +
+  geom_col_interactive(fill = "#a69d50",aes(tooltip = paste(categoria, "\nPrecio CBA:", lbl_money(cba), "\nPrecio SEPA:", lbl_money(sepa), "\nDiferencia en pesos:", lbl_money(diff)))) +
+  geom_hline(yintercept = 1, color = "grey") +
+  scale_y_continuous(breaks = c(-5000,0,5000,10000, 15000, 20000, 25000), limits = c(-3900, 25000)) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "", y = "Diferencia de precio")
+
+girafe_f(plot_diff)
+```
+
+Por otra parte, la base de datos del SEPA contiene registros con errores y *outliers* (valores extremos). Si bien estos últimos no representan, necesariamente un error, se realizó una limpieza para no distorsionar en exceso los valores reales del consumo promedio de una persona. Es decir, no se consideraron precios de productos que presentaban valores demasiado altos o demasiado bajos para cada categoría. 
+
+Así y todo, la distribución de precios por categoría quedó de la siguiente manera:
+
+```{r out.width="150%"}
+boxplot <- tabla_productos %>% 
+  ggplot() + 
+  geom_boxplot_interactive(aes(categoria, precio_unificado)) +
+  theme_minimal() +
+  scale_x_discrete(labels = scales::wrap_format(12)) +
+  theme(axis.text.x = element_text(angle = 45)) +
+  labs(x = "Categoría", y = "Precio x kg/lt (en pesos)")
+
+
+girafe(ggobj = boxplot,
+  width_svg = 10,
+  height_svg = 5,
+  bg = "transparent",
+  options = list(
+  opts_toolbar(
+  hidden = c( "saveaspng"
+  )
+  ),
+  #opts_sizing(rescale = F),
+  #opts_tooltip(use_fill = F),
+  opts_hover(css = "stroke:black;stroke-width:1px;")
+))
+```
+
+Se puede ver el amplio rango de precios en algunos productos como el café, así como  distribuciones más sesgadas en productos como la sal y la leche, cuyo precio promedio es  bajo pero se encuentran valores altos por la presencia de productos más "gourmet" o especiales.
+
+A fines de que el usuario pueda conocer la representatividad de los datos analizados, se presenta una tabla para explorar los más de 8.500 productos contemplados en el análisis, su categorización y precio de referencia (por kilo/litro).
+
+```{r}
+datatable(rownames = F, options = list(lengthMenu = c(10, 25, 50), pageLength = 10, 
+                                     dom = 'lfrtipB',
+                                     language = list(
+    url = "https://cdn.datatables.net/plug-ins/1.13.1/i18n/es-ES.json"
+  )), 
+          colnames = c("Descripción del producto", "Marca","Categoría (CBA)","Precio x kg/lt"),
+              tabla_productos) %>% 
+   formatRound(columns = c(
+                "precio_unificado"),
+                mark = ".",
+                digits = 0)
+```
+
+
+En resumen, el análisis debe ser tomado a modo exploratorio. Él mismo fue realizado en el marco del concurso [Contar con datos](https://udesa.edu.ar/contar-con-datos){target="_blank"} de la Universidad de San Andrés y busca brindar una mirada territorial y accesible a una base de datos con mucho potencial de estudio y ciertos obstáculos para su procesamiento (principalmente por el tamaño y la necesidad de limpieza).

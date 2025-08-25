@@ -1,4 +1,5 @@
 ---
+css: "styles.css"
 format:
   closeread-html:
     embed-resources: true
@@ -15,11 +16,12 @@ total <- read_sf("insumos/total.gpkg")
 cba <- read_rds("insumos/productos_gba.rds")
 marcas <- read_rds("insumos/data_marcas.rds")
 marcas_cat <- read_rds("insumos/marcas_categoria.rds")
+sucursales <- read_sf("insumos/sucursales.geojson")
 
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 ```
 
-A continuación se analiza el costo de los productos alimenticios en los partidos del Gran Buenos Aires y los barrios de la Ciudad Autónoma de Buenos Aires, a partir de datos del [Sistema Electrónico de Publicidad de Precios Argentinos (SEPA)](https://datos.gob.ar/dataset/produccion-precios-claros---base-sepa){target="_blank"}.
+A continuación se analiza el precio de los productos alimenticios en los partidos del Gran Buenos Aires (barrios de la Ciudad Autónoma de Buenos Aires y partidos de la Provincia de Buenos Aires adyacentes), a partir de datos de Precios Claros del [Sistema Electrónico de Publicidad de Precios Argentinos (SEPA)](https://datos.gob.ar/dataset/produccion-precios-claros---base-sepa){target="_blank"} publicados por la Subsecretaría de Defensa del Consumidor y Lealtad Comercial.
 
 ```{r}
 mapa <- total %>% 
@@ -56,7 +58,7 @@ girafe_f <- function(plot){
 
 ## ¿Cómo nos alimentamos?
 
-El SEPA está integrado por una amplia diversidad de productos y sus precios, declarados por comercios minoristas de todo el país. A fines de este análisis se identificaron aquellos productos que se asimilan a las categorías que conforman la [Canasta Básica Alimentaria (CBA)](https://www.indec.gob.ar/indec/web/Nivel4-Tema-4-43-149){target="_blank"} elaborada por el INDEC para el Gran Buenos Aires (GBA).
+El SEPA está integrado por una amplia diversidad de productos y sus precios, declarados por comercios de todo el país. A fines de este análisis se identificaron aquellos productos que se asimilan a las categorías que conforman la [Canasta Básica Alimentaria (CBA)](https://www.indec.gob.ar/indec/web/Nivel4-Tema-4-43-149){target="_blank"} elaborada por el INDEC para el Gran Buenos Aires (GBA).
 :::
 
 ::: {#cr-canasta}
@@ -121,7 +123,7 @@ Los datos del SEPA permiten conocer los precios observados de productos que inte
 
 :::{focus-on="cr-cba-mes"}
 
-Cabe mencionar que estos datos difieren de los publicados por INDEC para el cálculo de la inflación, en tanto se utilizan otras fuentes de datos y criterios para su medición.
+Cabe mencionar que estos datos difieren de los publicados por INDEC para el cálculo de la inflación, en tanto se utilizan otras fuentes de datos y criterios para su medición (ver [metodología](metodologia.qmd)).
 
 <br>
 
@@ -160,6 +162,8 @@ girafe_f(plot_cba_cat)
 
 **¿Y cuánto le cuesta a una familia alimentarse?** 
 
+<br>
+
 Tomando como referencia la composición de los hogares realizada por INDEC, podemos ver el costo de cubrir buena parte de la CBA según precios del SEPA, para distintos hogares.
 
 <br>
@@ -173,7 +177,7 @@ Tomando como referencia la composición de los hogares realizada por INDEC, pode
 :::
 
 :::{#cr-cba-hogares}
-```{r out.width="150%"}
+```{r out.width="200%"}
 # data_hogar <- total %>% 
 # st_drop_geometry() %>% 
 # summarise(adulto = mean(valor_cba)) %>% 
@@ -303,7 +307,7 @@ girafe_f(plot_productos)
 
 ::::{.cr-section}
 
-Al ver la relación entre aporte a la CBA y precio de los productos, vemos una relación del tipo: a mayor peso sobre la canasta, menor precio. [@cr-precios]
+Al ver la relación entre aporte a la CBA y precio de los productos, vemos que a mayor peso dentro de la canasta, menor es el precio. [@cr-precios]
 
 :::{#cr-precios}
 ```{r}
@@ -360,7 +364,7 @@ girafe_f(plot_point)
 
 ## ¿Qué productos podemos comprar?
 
-La oferta de productos es diversa, algo que influye en los precios analizados. A mayor variedad de productos (marcas, presentaciones), mayor variabilidad en los precios.
+La oferta de productos es diversa, algo que influye en los precios analizados. A mayor variedad de productos (comercios, marcas, presentaciones), mayor variabilidad en los precios.
 
 :::
 
@@ -399,11 +403,35 @@ marcas_circles_hl <- marcas_cat[[2]] %>%
 girafe_f(marcas_circles_hl)
 ```
 :::
+
 ::::
 
 ::::{.cr-section}
 
-Veamos las zonas donde hay mayor cantidad de opciones de marcas, de acuerdo a los datos registrados en el SEPA. [@cr-marcas-geo]
+Por su parte, el acceso a productos, y por ende, a precios variados, puede diferir según el lugar de residencia. El SEPA contempla comercios grandes con sucursales pero con una presencia desigual en el territorio, brindando mayores posibilidades de acceso a productos diversos en barrios porteños. [@cr-sucursales]
+ 
+La mayor concentración de sucursales es notoria en barrios de la ciudad, con respecto a la provincia. [@cr-sucursales]{scale-by="5" pan-to="-40%,50%"}
+
+Haciendo zoom dentro de la ciudad, también se ve una mayor presencia de comercios en barrios del centro porteño. [@cr-sucursales]{scale-by="10" pan-to="-80%,90%"}
+
+:::{#cr-sucursales}
+```{r}
+mapa_sucursales <- sucursales %>% 
+  ggplot() +
+geom_sf(data = total, fill = "#0097b2") +
+  geom_sf_interactive(aes(tooltip = paste(sucursales_tipo)), color = "white", alpha = .5, size = .02) +
+  theme_void() 
+
+
+girafe_f(mapa_sucursales)
+```
+:::
+
+::::
+
+::::{.cr-section}
+
+Veamos, a su vez, las zonas donde hay mayor cantidad de opciones de marcas de productos, de acuerdo a los datos registrados en el SEPA. [@cr-marcas-geo]
 
 :::{#cr-marcas-geo}
 ```{r}
@@ -420,37 +448,46 @@ girafe_f(mapa_marcas)
 ```
 :::
 
-Pongamos el foco en los productos que más pesan en la alimentación, de acuerdo a la CBA, y analicemos la conectración de marcas. [@cr-marcas-top]
+::::
 
-La leche presenta una mayor diversidad de marcas, asociada a productos para distintas edades (bebés, niños, adultos) y formas de presentación (en polvo, líquida) y [@cr-marcas-top]{scale-by="3.5" pan-to="100%,-60%"}
+::::{.cr-section}
 
-La Comuna 1, integrada por los barrios de Retiro, San Nicolás, Puerto Madero, San Telmo, Monserrat y Constitución, concetra una gran cantidad de marcas asociadas a este producto. [@cr-marcas-top]{scale-by="9" pan-to="250%,-120%"}
+Pongamos el foco en los productos que más pesan en la alimentación, de acuerdo a la CBA, y analicemos la concentración de marcas. [@cr-marcas-top]
 
+La leche presenta una mayor diversidad de marcas, justificada en la oferta de productos para distintas edades (bebés, niños, adultos) y formas de presentación (en polvo, líquida). [@cr-marcas-top]{scale-by="3.5" pan-to="110%,-70%"}
+
+La Comuna 1, integrada por los barrios de Retiro, San Nicolás, Puerto Madero, San Telmo, Monserrat y Constitución, presenta una gran cantidad de marcas asociadas a este producto. [@cr-marcas-top]{scale-by="11" pan-to="320%,-150%"}
+
+Vemos una gran diferencia respecto a partidos de la Provincia de Buenos Aires, como Marcos Paz y San Vicente, donde se registraron pocas marcas de leche, según los datos reportados en el SEPA. [@cr-marcas-top]{scale-by="6" pan-to="210%,-160%"}
+
+En cambio, en el resto de los productos con peso en la CBA, no hay una gran diferencia en la presencia de marcas por barrios. [@cr-marcas-top]{scale-by="2" pan-to="40%,60%"}
+
+En cambio, en el resto de los productos con peso en la CBA, no hay una gran diferencia en la presencia de marcas por barrios. [@cr-marcas-top]{scale-by="2" pan-to="-30%,-40%"}
+ 
 :::{#cr-marcas-top}
 ```{r}
-mapa_top_marcas <- marcas[["data_marcas"]] %>% 
+top_marcas <- marcas[["data_marcas"]] %>% 
 filter(categoria %in% c("Leche","Pan","Papa","Carnes","Hortalizas","Frutas")) %>% 
-left_join(total) %>% st_as_sf() %>% 
+left_join(total) %>% st_as_sf()
+
+### ICONOS AD HOC
+#leche <- png::readPNG("insumos/ad")
+
+coords_leche <- st_centroid( top_marcas %>% 
+filter(categoria == "Leche", nomdepto_censo %in% c("COMUNA 01","SAN VICENTE","MARCOS PAZ"))) %>% 
+  st_coordinates() %>% as.data.frame()
+coords_leche$categoria <- "Leche"
+coords_leche$icono <- "insumos/adulto.png"  # ruta al archivo de imagen
+
+mapa_top_marcas <- top_marcas %>% 
   ggplot() +
   geom_sf_interactive(aes(fill = marcas,
  tooltip = paste(nomdepto_censo, "\nMarcas:", lbl_int(marcas), "\nProducto:",categoria),                           data_id = nomdepto_censo), color = "white") +
+  ggimage::geom_image(data = coords_leche, aes(x = X, y = Y, image = icono), size = 0.03, color = "#0097b2") +
   scale_fill_viridis_c(option = "B", begin = .3) +
   theme_void() + labs(fill = "Cantidad de marcas") + theme(legend.position ="bottom") +
 facet_wrap_interactive(~categoria)
 
-# g <- purrr::map( c("Leche","Pan","Papa","Carnes","Hortalizas","Frutas"),
-#            function(x) {
-#              ggplot() +
-#   geom_sf_interactive(data = filter(marcas[["data_marcas"]] %>% 
-# filter(categoria == x) %>% 
-# left_join(total) %>% st_as_sf()), aes(fill = marcas,
-#  tooltip = paste(nomdepto_censo, "\nMarcas:", lbl_int(marcas)),                           data_id = nomdepto_censo)) +
-#   scale_fill_viridis_c(option = "B", begin = .3) +
-#   theme_void() + labs(title = x, fill = "Cantidad de marcas") + theme(legend.position ="bottom")})
-# 
-# 
-# 
-# g2 <- cowplot::plot_grid(plotlist = g)
 
 girafe_f(mapa_top_marcas)
 ```
@@ -458,3 +495,6 @@ girafe_f(mapa_top_marcas)
 
 ::::
 
+<br>
+
+¡Gracias por llegar hasta acá! Recordá visitar la [sección metodológica](metodologia.html) para conocer más en detalle del análisis.
