@@ -147,7 +147,7 @@ annotation_raster_interactive(person, xmin = .7, xmax = 6,
 ymin = 50000, ymax = 64000, tooltip = "¡Hola! Soy un varón de entre 30 y 60 años y estos son mis <br>consumos alimenticios mensuales aproximados.") +
 coord_flip() +
 theme_minimal() +
-labs(x = "", y = "Valor promedio", title = "Monto destinado a cubrir la CBA por producto")
+labs(x = "", y = "Valor promedio")
 
 girafe_f(plot_cba_cat)
 ```
@@ -360,6 +360,35 @@ girafe_f(plot_point)
 
 ::::{.cr-section}
 
+:::{focus-on="cr-sucursales"}
+
+## ¿Dónde compramos?
+
+Por su parte, el acceso a productos, y por ende, a precios variados, puede diferir según el lugar de residencia. El SEPA contempla comercios grandes con sucursales pero con una presencia desigual en el territorio, brindando mayores posibilidades de acceso a productos diversos en barrios porteños.
+
+:::
+
+La mayor concentración de sucursales es notoria en barrios de la ciudad, con respecto a la provincia. [@cr-sucursales]{scale-by="5" pan-to="-40%,50%"}
+
+Haciendo zoom dentro de la ciudad, también se ve una mayor presencia de comercios en barrios del centro porteño. [@cr-sucursales]{scale-by="10" pan-to="-80%,120%"}
+
+:::{#cr-sucursales}
+```{r}
+mapa_sucursales <- sucursales %>% 
+  ggplot() +
+geom_sf(data = total, fill = "#0097b2") +
+  geom_sf_interactive(aes(tooltip = paste(sucursales_tipo)), color = "white", alpha = .5, size = .02) +
+  theme_void() 
+
+
+girafe_f(mapa_sucursales)
+```
+:::
+
+::::
+
+::::{.cr-section}
+
 :::{focus-on="cr-marcas"}
 
 ## ¿Qué productos podemos comprar?
@@ -401,29 +430,6 @@ marcas_circles_hl <- marcas_cat[[2]] %>%
   theme(legend.position="none", plot.margin=unit(c(0,0,0,0),"cm"))
 
 girafe_f(marcas_circles_hl)
-```
-:::
-
-::::
-
-::::{.cr-section}
-
-Por su parte, el acceso a productos, y por ende, a precios variados, puede diferir según el lugar de residencia. El SEPA contempla comercios grandes con sucursales pero con una presencia desigual en el territorio, brindando mayores posibilidades de acceso a productos diversos en barrios porteños. [@cr-sucursales]
- 
-La mayor concentración de sucursales es notoria en barrios de la ciudad, con respecto a la provincia. [@cr-sucursales]{scale-by="5" pan-to="-40%,50%"}
-
-Haciendo zoom dentro de la ciudad, también se ve una mayor presencia de comercios en barrios del centro porteño. [@cr-sucursales]{scale-by="10" pan-to="-80%,90%"}
-
-:::{#cr-sucursales}
-```{r}
-mapa_sucursales <- sucursales %>% 
-  ggplot() +
-geom_sf(data = total, fill = "#0097b2") +
-  geom_sf_interactive(aes(tooltip = paste(sucursales_tipo)), color = "white", alpha = .5, size = .02) +
-  theme_void() 
-
-
-girafe_f(mapa_sucursales)
 ```
 :::
 
@@ -497,4 +503,4 @@ girafe_f(mapa_top_marcas)
 
 <br>
 
-¡Gracias por llegar hasta acá! Recordá visitar la [sección metodológica](metodologia.html) para conocer más en detalle del análisis.
+<p style="font-size: large; text-align: center;">**¡Gracias por llegar hasta acá! Recordá visitar la [sección metodológica](metodologia.html) para conocer más en detalle del análisis.**</p>
