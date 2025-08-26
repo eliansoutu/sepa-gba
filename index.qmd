@@ -231,7 +231,7 @@ Mientras que **`r str_to_title(slice_min(total, valor_cba, n = 1)$nomdepto_censo
 
 :::{focus-on="cr-top"}
 
-Es decir, que en este partido cubrir las necesidades alimentarias es, en promedio, un 22,7% más barato que en el partido más caro. 
+Es decir, que en este partido cubrir las necesidades alimentarias es, en promedio, un 18,5% más barato que en el partido más caro. 
 
 <br>
 
@@ -261,11 +261,11 @@ productos <- data %>% st_drop_geometry() %>%  summarise(precio = mean(precio_uni
 
 ## ¿Cuánto me sale cada producto?
 
-El <b style = "color: #d6ed64;">café</b> es el producto más caro de los analizados (si bien su peso en la alimentación es bajo) por amplia diferencia, explicado por la diversidad de marcas (nacionales e importadas) y formas de presentación. En promedio, para el GBA, un kilo de café ronda los `r lbl_money(productos$precio[productos$categoria=="Café"])` pesos.
+El <b style = "color: #d6ed64;">café</b> es el producto más caro de los analizados (si bien su peso en la alimentación es bajo) por amplia diferencia, explicado por la diversidad de marcas (nacionales e importadas) y formas de presentación. En promedio, para el GBA, un kilo de café ronda los <b style = "color: #d6ed64;">`r lbl_money(productos$precio[productos$categoria=="Café"])` pesos</b>.
 
 :::
 
-Por su parte, el producto más barato de la CBA es la <b style = "color: #d6ed64;">harina</b>: `r lbl_money(productos$precio[productos$categoria=="Harina de trigo"])` pesos en promedio por kilo. Le siguen, muy de cerca, la **papa** (`r lbl_money(productos$precio[productos$categoria=="Papa"])`) y la **batata** (`r lbl_money(productos$precio[productos$categoria=="Batata"])`). [@cr-productos-min]
+Por su parte, el producto más barato de la CBA es la <b style = "color: #d6ed64;">harina: `r lbl_money(productos$precio[productos$categoria=="Harina de trigo"])` pesos</b> en promedio por kilo. Le siguen, muy de cerca, la **papa** (`r lbl_money(productos$precio[productos$categoria=="Papa"])`) y la **batata** (`r lbl_money(productos$precio[productos$categoria=="Batata"])`). [@cr-productos-min]
 
 :::{#cr-productos-max}
 ```{r}
@@ -515,6 +515,20 @@ facet_wrap_interactive(~categoria)
 
 
 girafe_f(mapa_top_marcas)
+```
+:::
+
+::::
+
+::::{.cr-section}
+
+Estos datos buscan ser útiles para conocer más sobre cuánto gastan las personas en alimentación y cuáles son las posibilidades de acceder a productos dentro del GBA. [@cr-canasta-end]
+
+**Y vos, ¿sabés cuánto pagás?** [@cr-canasta-end]
+
+:::{#cr-canasta-end}
+```{r}
+girafe_f(mapa)
 ```
 :::
 
