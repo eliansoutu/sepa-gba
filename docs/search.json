@@ -18,21 +18,21 @@
     "href": "index.html",
     "title": "SEPA cuánto paga",
     "section": "",
-    "text": "A continuación se analiza el precio de los productos alimenticios en los partidos del Gran Buenos Aires (barrios de la Ciudad Autónoma de Buenos Aires y partidos de la Provincia de Buenos Aires adyacentes), a partir de datos de Precios Claros del Sistema Electrónico de Publicidad de Precios Argentinos (SEPA) publicados por la Subsecretaría de Defensa del Consumidor y Lealtad Comercial.\n¡Gracias por llegar hasta acá! Recordá visitar la sección metodológica para conocer más en detalle del análisis."
+    "text": "A continuación se analiza el precio de un conjunto de productos alimenticios en el Gran Buenos Aires (barrios de la Ciudad Autónoma de Buenos Aires y partidos de la Provincia de Buenos Aires adyacentes), a partir de datos de Precios Claros del Sistema Electrónico de Publicidad de Precios Argentinos (SEPA) publicados por la Subsecretaría de Defensa del Consumidor y Lealtad Comercial.\n¡Gracias por llegar hasta acá! Recordá visitar la sección metodológica para conocer más en detalle del análisis.\n**¡Datos descargados del portal de datos abiertos del Ministerio de Economía"
   },
   {
     "objectID": "index.html#cómo-nos-alimentamos",
     "href": "index.html#cómo-nos-alimentamos",
     "title": "SEPA cuánto paga",
     "section": "¿Cómo nos alimentamos?",
-    "text": "¿Cómo nos alimentamos?\nEl SEPA está integrado por una amplia diversidad de productos y sus precios, declarados por comercios de todo el país. A fines de este análisis se identificaron aquellos productos que se asimilan a las categorías que conforman la Canasta Básica Alimentaria (CBA) elaborada por el INDEC para el Gran Buenos Aires (GBA)."
+    "text": "¿Cómo nos alimentamos?\nEl SEPA está integrado por una amplia diversidad de productos y sus precios, declarados por comercios de todo el país.\n\nA fines de este análisis se identificaron aquellos productos que se asimilan a las categorías que conforman la Canasta Básica Alimentaria (CBA) elaborada por el INDEC para el Gran Buenos Aires (GBA)."
   },
   {
     "objectID": "index.html#cuánto-cuesta-alimentarse",
     "href": "index.html#cuánto-cuesta-alimentarse",
     "title": "SEPA cuánto paga",
     "section": "¿Cuánto cuesta alimentarse?",
-    "text": "¿Cuánto cuesta alimentarse?\nLos datos del SEPA permiten conocer los precios observados de productos que integran las categorías de la CBA. En promedio, en el GBA un adulto necesitó un poco más de $245.893 para alimentarse en el mes de julio 2025."
+    "text": "¿Cuánto cuesta alimentarse?\nLos datos del SEPA permiten conocer los precios de productos que integran las categorías de la CBA.\n\nTodos los valores corresponden a julio de 2025."
   },
   {
     "objectID": "index.html#dónde-es-más-carobarato-alimentarse",
@@ -56,10 +56,10 @@
     "text": "¿Dónde compramos?\nPor su parte, el acceso a productos, y por ende, a precios variados, puede diferir según el lugar de residencia. El SEPA contempla comercios grandes con sucursales pero con una presencia desigual en el territorio, brindando mayores posibilidades de acceso a productos diversos en barrios porteños."
   },
   {
-    "objectID": "index.html#qué-productos-podemos-comprar",
-    "href": "index.html#qué-productos-podemos-comprar",
+    "objectID": "index.html#qué-tanto-podemos-elegir",
+    "href": "index.html#qué-tanto-podemos-elegir",
     "title": "SEPA cuánto paga",
-    "section": "¿Qué productos podemos comprar?",
-    "text": "¿Qué productos podemos comprar?\nLa oferta de productos es diversa, algo que influye en los precios analizados. A mayor variedad de productos (comercios, marcas, presentaciones), mayor variabilidad en los precios."
+    "section": "¿Qué tanto podemos elegir?",
+    "text": "¿Qué tanto podemos elegir?\nA su vez, la oferta de productos es diversa, algo que influye en los precios analizados. A mayor variedad de productos (comercios, marcas, presentaciones), mayor variabilidad en los precios."
   }
 ]

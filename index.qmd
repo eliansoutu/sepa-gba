@@ -21,7 +21,7 @@ sucursales <- read_sf("insumos/sucursales.geojson")
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 ```
 
-A continuación se analiza el precio de los productos alimenticios en los partidos del Gran Buenos Aires (barrios de la Ciudad Autónoma de Buenos Aires y partidos de la Provincia de Buenos Aires adyacentes), a partir de datos de Precios Claros del [Sistema Electrónico de Publicidad de Precios Argentinos (SEPA)](https://datos.gob.ar/dataset/produccion-precios-claros---base-sepa){target="_blank"} publicados por la Subsecretaría de Defensa del Consumidor y Lealtad Comercial.
+A continuación se analiza el precio de un conjunto de productos alimenticios en el Gran Buenos Aires (barrios de la Ciudad Autónoma de Buenos Aires y partidos de la Provincia de Buenos Aires adyacentes), a partir de datos de [Precios Claros del Sistema Electrónico de Publicidad de Precios Argentinos (SEPA)](https://www.preciosclaros.gob.ar/){target="_blank"} publicados por la Subsecretaría de Defensa del Consumidor y Lealtad Comercial.
 
 ```{r}
 mapa <- total %>% 
@@ -58,7 +58,11 @@ girafe_f <- function(plot){
 
 ## ¿Cómo nos alimentamos?
 
-El SEPA está integrado por una amplia diversidad de productos y sus precios, declarados por comercios de todo el país. A fines de este análisis se identificaron aquellos productos que se asimilan a las categorías que conforman la [Canasta Básica Alimentaria (CBA)](https://www.indec.gob.ar/indec/web/Nivel4-Tema-4-43-149){target="_blank"} elaborada por el INDEC para el Gran Buenos Aires (GBA).
+El SEPA está integrado por una amplia diversidad de productos y sus precios, declarados por comercios de todo el país. 
+
+<br>
+
+A fines de este análisis se identificaron aquellos productos que se asimilan a las categorías que conforman la [Canasta Básica Alimentaria (CBA)](https://www.indec.gob.ar/indec/web/Nivel4-Tema-4-43-149){target="_blank"} elaborada por el INDEC para el Gran Buenos Aires (GBA).
 :::
 
 ::: {#cr-canasta}
@@ -71,9 +75,9 @@ knitr::include_graphics("insumos/canasta.png")
 
 ::::{.cr-section}
 
-La CBA es una medida que representa los hábitos de consumo y las necesidades kilocalóricas y proteicas imprescindibles de una persona, tomando como referencia un varón adulto de entre 30 y 60 años, de actividad moderada, durante un mes. <br> Es utilizada para la medición de la pobreza extrema en Argentina. [@cr-cba]
+La CBA es una medida que representa los hábitos de consumo y las necesidades kilocalóricas y proteicas imprescindibles de una persona, tomando como referencia un varón adulto de entre 30 y 60 años, de actividad moderada, durante un mes. <br> **Es utilizada para la medición de la pobreza extrema en Argentina**. [@cr-cba]
 
-En este sentido, vemos que productos como la leche, el pan, la papa, la carne, las frutas y las hortalizas tienen un peso importante en la alimentación de los argentinos. [@cr-cba-hl]
+En este sentido, vemos que productos como **la leche, el pan, la papa, la carne, las frutas y las hortalizas** tienen un peso importante en la alimentación de los argentinos. [@cr-cba-hl]
 
 ::: {#cr-cba}
 ```{r}
@@ -116,7 +120,10 @@ girafe_f(circles)
 
 ## ¿Cuánto cuesta alimentarse?
 
-Los datos del SEPA permiten conocer los precios observados de productos que integran las categorías de la CBA. En promedio, en el GBA un adulto necesitó un poco más de `r lbl_money(mean(total$valor_cba))` para alimentarse en el mes de julio 2025.
+Los datos del SEPA permiten conocer los precios de productos que integran las categorías de la CBA.
+
+<p style="font-size: medium;">**Todos los valores corresponden a julio de 2025**.
+</p>
 
 :::
 
@@ -166,26 +173,27 @@ girafe_f(plot_cba_cat)
 
 Tomando como referencia la composición de los hogares realizada por INDEC, podemos ver el costo de cubrir buena parte de la CBA según precios del SEPA, para distintos hogares.
 
-<br>
-
-- Hogar 1: tres integrantes, compuesto por una mujer de 35 años, su hijo de 18 años y su madre de 61 años.
-
-- Hogar 2: cuatro integrantes, compuesto por un varón de 35 años, una mujer de 31 años, un hijo de 6 años y una hija de 8 años.
-
-- Hogar 3: cinco integrantes, constituido por un varón y una mujer, ambos de 30 años, y tres hijos de 1, 3 y 5 años.
-
 :::
 
-:::{#cr-cba-hogares}
-```{r out.width="200%"}
-# data_hogar <- total %>% 
-# st_drop_geometry() %>% 
-# summarise(adulto = mean(valor_cba)) %>% 
-# mutate("Adulto equivalente" = adulto,
-#        "Hogar 1" = adulto*2.46,
-#        "Hogar 2" = adulto*3.09,
-#        "Hogar 3" = adulto*3.25)
+```{r include=FALSE}
+data_hogar <- total %>%
+st_drop_geometry() %>%
+summarise(adulto = mean(valor_cba)) %>%
+mutate("Hogar1" = adulto*2.46,
+       "Hogar2" = adulto*3.09,
+       "Hogar3" = adulto*3.25)
+```
 
+Un **adulto** equivalente (varón de entre 30 y 60 años), **gastó en promedio `r lbl_money(data_hogar$adulto)`** pesos en julio de 2025 para alimentarse. [@cr-cba-hogares]{scale-by="2.5" pan-to="60%,60%"}
+
+Un hogar de **tres integrantes**, compuesto por una mujer de 35 años, su hijo de 18 años y su madre de 61 años, necesitó **`r lbl_money(data_hogar$Hogar1)`**. [@cr-cba-hogares]{scale-by="2" pan-to="-50%,50%"}
+
+Mientras que un hogar de **cuatro integrantes**, compuesto por un varón de 35 años, una mujer de 31 años, un hijo de 6 años y una hija de 8 años: **`r lbl_money(data_hogar$Hogar2)`**. [@cr-cba-hogares]{scale-by="2" pan-to="50%,-50%"}
+
+Por último, uno de **cinco integrantes**, constituido por un varón y una mujer, ambos de 30 años, y tres hijos de 1, 3 y 5 años requirió **`r lbl_money(data_hogar$Hogar3)`**. [@cr-cba-hogares]{scale-by="2" pan-to="-50%,-50%"}
+
+:::{#cr-cba-hogares}
+```{r}
 knitr::include_graphics("insumos/hogares.png")
 ```
 :::
@@ -213,13 +221,21 @@ girafe_f(mapa)
 :::
 
 
-`r str_to_title(slice_max(total, valor_cba, n = 1)$nomdepto_censo)` arrojó el mayor valor promedio de CBA de acuerdo a los precios relevados [@cr-top]{scale-by="5" pan-to="10%,100%"}
+**`r str_to_title(slice_max(total, valor_cba, n = 1)$nomdepto_censo)` arrojó el mayor valor promedio** de acuerdo a los precios relevados, seguido de los partidos de Pilar, Vicente López y San Fernando. [@cr-top]{scale-by="5" pan-to="10%,100%"}
 
 
-Mientras que `r str_to_title(slice_min(total, valor_cba, n = 1)$nomdepto_censo)` registró el menor valor, con una diferencia de `r comunicacion::lbl_money(slice_max(total, valor_cba, n = 1)$valor_cba - slice_min(total, valor_cba, n = 1)$valor_cba)` pesos respecto `r str_to_title(slice_max(total, valor_cba, n = 1)$nomdepto_censo)`. [@cr-top]{scale-by="4" pan-to="100%,-40%"}
+Mientras que **`r str_to_title(slice_min(total, valor_cba, n = 1)$nomdepto_censo)` registró el menor valor**, con una diferencia de `r comunicacion::lbl_money(slice_max(total, valor_cba, n = 1)$valor_cba - slice_min(total, valor_cba, n = 1)$valor_cba)` pesos respecto `r str_to_title(slice_max(total, valor_cba, n = 1)$nomdepto_censo)`. [@cr-top]{scale-by="4" pan-to="100%,-40%"}
 
-Es decir, que en este partido cubrir las necesidades alimentarias es, en promedio, un 22,7% más barato que en el partido más caro. [@cr-top]{scale-by="1"}
 
+:::{focus-on="cr-top"}
+
+Es decir, que en este partido cubrir las necesidades alimentarias es, en promedio, un 22,7% más barato que en el partido más caro. 
+
+<br>
+
+<p style="font-size: medium;">*Cabe destacar que Marcos Paz es una zona más despoblada y, por ende, con menor cantidad de comercios.*
+</p>
+:::
 
 :::{#cr-top}
 ```{r}
@@ -247,7 +263,7 @@ El <b style = "color: #d6ed64;">café</b> es el producto más caro de los analiz
 
 :::
 
-Por su parte, el producto más barato de la CBA es la <b style = "color: #d6ed64;">harina</b>: `r lbl_money(productos$precio[productos$categoria=="Harina de trigo"])` pesos en promedio por kilo. Le siguen, muy de cerca, la **papa**(`r lbl_money(productos$precio[productos$categoria=="Papa"])`) y la **batata** (`r lbl_money(productos$precio[productos$categoria=="Batata"])`). [@cr-productos-min]
+Por su parte, el producto más barato de la CBA es la <b style = "color: #d6ed64;">harina</b>: `r lbl_money(productos$precio[productos$categoria=="Harina de trigo"])` pesos en promedio por kilo. Le siguen, muy de cerca, la **papa** (`r lbl_money(productos$precio[productos$categoria=="Papa"])`) y la **batata** (`r lbl_money(productos$precio[productos$categoria=="Batata"])`). [@cr-productos-min]
 
 :::{#cr-productos-max}
 ```{r}
@@ -307,7 +323,7 @@ girafe_f(plot_productos)
 
 ::::{.cr-section}
 
-Al ver la relación entre aporte a la CBA y precio de los productos, vemos que a mayor peso dentro de la canasta, menor es el precio. [@cr-precios]
+Al ver la relación entre aporte a la CBA y precio de los productos, vemos que **un mayor peso dentro de la canasta, no representa un mayor precio**. [@cr-precios]
 
 :::{#cr-precios}
 ```{r}
@@ -364,13 +380,12 @@ girafe_f(plot_point)
 
 ## ¿Dónde compramos?
 
-Por su parte, el acceso a productos, y por ende, a precios variados, puede diferir según el lugar de residencia. El SEPA contempla comercios grandes con sucursales pero con una presencia desigual en el territorio, brindando mayores posibilidades de acceso a productos diversos en barrios porteños.
+Por su parte, el acceso a productos, y por ende, a precios variados, puede diferir según el lugar de residencia. El SEPA contempla comercios grandes con sucursales pero con una **presencia desigual en el territorio**, brindando mayores posibilidades de acceso a productos diversos en barrios porteños.
 
 :::
 
-La mayor concentración de sucursales es notoria en barrios de la ciudad, con respecto a la provincia. [@cr-sucursales]{scale-by="5" pan-to="-40%,50%"}
+La concentración de sucursales es notoria en barrios de la ciudad, con respecto a la provincia. [@cr-sucursales]{scale-by="5" pan-to="-40%,50%"}
 
-Haciendo zoom dentro de la ciudad, también se ve una mayor presencia de comercios en barrios del centro porteño. [@cr-sucursales]{scale-by="10" pan-to="-80%,120%"}
 
 :::{#cr-sucursales}
 ```{r}
@@ -391,9 +406,9 @@ girafe_f(mapa_sucursales)
 
 :::{focus-on="cr-marcas"}
 
-## ¿Qué productos podemos comprar?
+## ¿Qué tanto podemos elegir?
 
-La oferta de productos es diversa, algo que influye en los precios analizados. A mayor variedad de productos (comercios, marcas, presentaciones), mayor variabilidad en los precios.
+A su vez, la oferta de productos es diversa, algo que influye en los precios analizados. A mayor variedad de productos (comercios, marcas, presentaciones), mayor variabilidad en los precios.
 
 :::
 
@@ -460,15 +475,15 @@ girafe_f(mapa_marcas)
 
 Pongamos el foco en los productos que más pesan en la alimentación, de acuerdo a la CBA, y analicemos la concentración de marcas. [@cr-marcas-top]
 
-La leche presenta una mayor diversidad de marcas, justificada en la oferta de productos para distintas edades (bebés, niños, adultos) y formas de presentación (en polvo, líquida). [@cr-marcas-top]{scale-by="3.5" pan-to="110%,-70%"}
+**La leche presenta una mayor diversidad de marcas**, justificada en la oferta de productos para distintas edades (bebés, niños, adultos) y formas de presentación (en polvo, líquida). [@cr-marcas-top]{scale-by="3.5" pan-to="110%,-70%"}
 
 La Comuna 1, integrada por los barrios de Retiro, San Nicolás, Puerto Madero, San Telmo, Monserrat y Constitución, presenta una gran cantidad de marcas asociadas a este producto. [@cr-marcas-top]{scale-by="11" pan-to="320%,-150%"}
 
-Vemos una gran diferencia respecto a partidos de la Provincia de Buenos Aires, como Marcos Paz y San Vicente, donde se registraron pocas marcas de leche, según los datos reportados en el SEPA. [@cr-marcas-top]{scale-by="6" pan-to="210%,-160%"}
+Vemos una gran diferencia respecto a otros barrios de la ciudad o partidos de la Provincia de Buenos Aires. [@cr-marcas-top]{scale-by="3.5" pan-to="110%,-70%"}
 
-En cambio, en el resto de los productos con peso en la CBA, no hay una gran diferencia en la presencia de marcas por barrios. [@cr-marcas-top]{scale-by="2" pan-to="40%,60%"}
+En cambio, **en el resto de los productos con peso en la CBA, no hay una gran diferencia en la presencia de marcas por barrios**. Carnes y frutas rondan entre las 2 y las 11 marcas. [@cr-marcas-top]{scale-by="2" pan-to="40%,60%"}
 
-En cambio, en el resto de los productos con peso en la CBA, no hay una gran diferencia en la presencia de marcas por barrios. [@cr-marcas-top]{scale-by="2" pan-to="-30%,-40%"}
+Mientras que el pan y la papa registran entre 5 y 15 y entre 1 y 7 marcas, respectivamente. [@cr-marcas-top]{scale-by="2" pan-to="-30%,-40%"}
  
 :::{#cr-marcas-top}
 ```{r}
@@ -480,7 +495,7 @@ left_join(total) %>% st_as_sf()
 #leche <- png::readPNG("insumos/ad")
 
 coords_leche <- st_centroid( top_marcas %>% 
-filter(categoria == "Leche", nomdepto_censo %in% c("COMUNA 01","SAN VICENTE","MARCOS PAZ"))) %>% 
+filter(categoria == "Leche", nomdepto_censo %in% c("COMUNA 01"))) %>% 
   st_coordinates() %>% as.data.frame()
 coords_leche$categoria <- "Leche"
 coords_leche$icono <- "insumos/adulto.png"  # ruta al archivo de imagen
@@ -504,3 +519,6 @@ girafe_f(mapa_top_marcas)
 <br>
 
 <p style="font-size: large; text-align: center;">**¡Gracias por llegar hasta acá! Recordá visitar la [sección metodológica](metodologia.html) para conocer más en detalle del análisis.**</p>
+
+<p style="font-size: large; text-align: center;">**¡Datos descargados del [portal de datos abiertos del Ministerio de Economía](https://datos.gob.ar/dataset/produccion-precios-claros---base-sepa)</p>
+
