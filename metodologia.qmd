@@ -39,7 +39,7 @@ girafe_f <- function(plot){
 
 La información de precios analizada corresponde a datos publicados en el portal de datos abiertos para el período del 22 al 31 de julio de 2025. Se descargaron las bases de cada día y se realizó un promedio del período para el cálculo de los precios por producto/barrio.
 
-Los datos analizados, pertenecientes al SEPA, no buscan representar el valor real de la CBA, sino un estudio exploratorio de las diferencias de precios observadas en el territorio, así como la presencia de productos en el mismo. No se debe comparar la información con la publicada por INDEC en tanto:
+Los datos analizados, pertenecientes al SEPA, no buscan representar el valor real de la CBA, sino un estudio exploratorio de las diferencias de precios observadas en el territorio, así como la presencia de productos en el mismo. No se debe comparar la información con la publicada por el INDEC para el cálculo del IPC, en tanto:
 
 - Son fuentes de datos y metodologías distintas.
 - No se identificaron algunos productos en la base del SEPA que conforman la CBA: menudencias, otras harinas (maíz), huevos y azúcar.
@@ -53,7 +53,7 @@ A modo de referencia, se presenta a continuación un gráfico que muestra la dif
 plot_diff <- precios_diff %>%
   mutate(categoria = fct_reorder(categoria, diff)) %>% 
   ggplot(aes(categoria, diff)) +
-  geom_col_interactive(fill = "#a69d50",aes(tooltip = paste(categoria, "\nPrecio CBA:", lbl_money(cba), "\nPrecio SEPA:", lbl_money(sepa), "\nDiferencia en pesos:", lbl_money(diff)))) +
+  geom_col_interactive(fill = "#a69d50",aes(tooltip = paste(categoria, "\nPrecio CBA:", lbl_money(cba), "\nPrecio SEPA:", lbl_money(sepa), "\nDiferencia en pesos (promedio):", lbl_money(diff)))) +
   geom_hline(yintercept = 1, color = "grey") +
   scale_y_continuous(breaks = c(-5000,0,5000,10000, 15000, 20000, 25000), limits = c(-3900, 25000)) +
   coord_flip() +
@@ -92,7 +92,7 @@ girafe(ggobj = boxplot,
 ))
 ```
 
-Se puede ver el amplio rango de precios en algunos productos como el café, así como  distribuciones más sesgadas en productos como la sal y la leche, cuyo precio promedio es  bajo pero se encuentran valores altos por la presencia de productos más "gourmet" o especiales.
+Se puede ver el amplio rango de precios en algunos productos como el café, así como  distribuciones más sesgadas en productos como la sal y la leche, cuyo precio promedio es  bajo pero se encuentran valores altos por la presencia de productos "gourmet" o especiales.
 
 A fines de que el usuario pueda conocer la representatividad de los datos analizados, se presenta una tabla para explorar los más de 8.500 productos contemplados en el análisis, su categorización y precio de referencia (por kilo/litro).
 
@@ -110,5 +110,6 @@ datatable(rownames = F, options = list(lengthMenu = c(10, 25, 50), pageLength = 
                 digits = 0)
 ```
 
+<br>
 
 En resumen, el análisis debe ser tomado a modo exploratorio. Él mismo fue realizado en el marco del concurso [Contar con datos](https://udesa.edu.ar/contar-con-datos){target="_blank"} de la Universidad de San Andrés y busca brindar una mirada territorial y accesible a una base de datos con mucho potencial de estudio y ciertos obstáculos para su procesamiento (principalmente por el tamaño y la necesidad de limpieza).

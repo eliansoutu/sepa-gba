@@ -122,6 +122,8 @@ girafe_f(circles)
 
 Los datos del SEPA permiten conocer los precios de productos que integran las categorías de la CBA.
 
+<br>
+
 <p style="font-size: medium;">**Todos los valores corresponden a julio de 2025**.
 </p>
 
@@ -452,7 +454,9 @@ girafe_f(marcas_circles_hl)
 
 ::::{.cr-section}
 
-Veamos, a su vez, las zonas donde hay mayor cantidad de opciones de marcas de productos, de acuerdo a los datos registrados en el SEPA. [@cr-marcas-geo]
+Veamos, también, las zonas donde hay mayor cantidad de opciones de marcas de productos, de acuerdo a los datos registrados en el SEPA. [@cr-marcas-geo]
+
+Las comunas 1 y 14 ofrecen una mayor cantidad de marcas para los prodcutos analizados de la CBA. Les siguen los partidos de Quilmes, Morón y Tigre. [@cr-marcas-geo]
 
 :::{#cr-marcas-geo}
 ```{r}
@@ -520,5 +524,5 @@ girafe_f(mapa_top_marcas)
 
 <p style="font-size: large; text-align: center;">**¡Gracias por llegar hasta acá! Recordá visitar la [sección metodológica](metodologia.html) para conocer más en detalle del análisis.**</p>
 
-<p style="font-size: large; text-align: center;">**¡Datos descargados del [portal de datos abiertos del Ministerio de Economía](https://datos.gob.ar/dataset/produccion-precios-claros---base-sepa)</p>
+<p style="font-size: large; text-align: center;">**¡Datos descargados del [portal de datos abiertos del Ministerio de Economía](https://datos.gob.ar/dataset/produccion-precios-claros---base-sepa)**</p>
 
