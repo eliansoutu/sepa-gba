@@ -37,7 +37,7 @@ girafe_f <- function(plot){
 
 ## Aclaraciones sobre la información presentada en el análisis
 
-La información de precios analizada corresponde a datos publicados en el portal de datos abiertos para el período del 22 al 31 de julio de 2025. Se descargaron las bases de cada día y se realizó un promedio del período para el cálculo de los precios por producto/barrio.
+La información de precios analizada corresponde a datos publicados en el portal de datos abiertos para el período del 22 al 31 de julio de 2025. 
 
 Los datos analizados, pertenecientes al SEPA, no buscan representar el valor real de la CBA, sino un estudio exploratorio de las diferencias de precios observadas en el territorio, así como la presencia de productos en el mismo. No se debe comparar la información con la publicada por el INDEC para el cálculo del IPC, en tanto:
 
@@ -47,15 +47,15 @@ Los datos analizados, pertenecientes al SEPA, no buscan representar el valor rea
 - Se unificaron los productos de galletitas, sin distinguir dulces y de agua como lo hace la CBA.
 - La base del SEPA contiene una diversidad de productos (alimenticios y no alimenticios). Si bien se realizó una limpieza exhaustiva, puede contener productos ajenos a aquellos contemplados por la CBA. La categorización de los productos fue realizada de manera *ad hoc*, dado que la base de datos no presenta una columna con la categoría genérica del producto.
 
-A modo de referencia, se presenta a continuación un gráfico que muestra la diferencia de precios promedio por kilo/litro para las categorías de productos, en comparación con lo publicado por INDEC en el [informe de IPC de INDEC (julio 2025)](https://www.indec.gob.ar/uploads/informesdeprensa/ipc_08_25B0A3ACE622.pdf){target="_blank"}:
+A modo de referencia, se presenta a continuación un gráfico que muestra la diferencia de precios por kilo/litro para las categorías de productos, en comparación con lo publicado por INDEC en el [informe de IPC de INDEC (julio 2025)](https://www.indec.gob.ar/uploads/informesdeprensa/ipc_08_25B0A3ACE622.pdf){target="_blank"}:
 
 ```{r}
 plot_diff <- precios_diff %>%
   mutate(categoria = fct_reorder(categoria, diff)) %>% 
   ggplot(aes(categoria, diff)) +
-  geom_col_interactive(fill = "#a69d50",aes(tooltip = paste(categoria, "\nPrecio CBA:", lbl_money(cba), "\nPrecio SEPA:", lbl_money(sepa), "\nDiferencia en pesos (promedio):", lbl_money(diff)))) +
+  geom_col_interactive(fill = "#a69d50",aes(tooltip = paste(categoria, "\nPrecio CBA:", lbl_money(cba), "\nPrecio SEPA (mediana):", lbl_money(sepa), "\nDiferencia en pesos:", lbl_money(diff)))) +
   geom_hline(yintercept = 1, color = "grey") +
-  scale_y_continuous(breaks = c(-5000,0,5000,10000, 15000, 20000, 25000), limits = c(-3900, 25000)) +
+  scale_y_continuous(breaks = c(-5000,0,5000,10000, 15000, 20000, 25000), limits = c(-5000, 30000)) +
   coord_flip() +
   theme_minimal() +
   labs(x = "", y = "Diferencia de precio")
@@ -63,9 +63,9 @@ plot_diff <- precios_diff %>%
 girafe_f(plot_diff)
 ```
 
-Por otra parte, la base de datos del SEPA contiene registros con errores y *outliers* (valores extremos). Si bien estos últimos no representan, necesariamente un error, se realizó una limpieza para no distorsionar en exceso los valores reales del consumo promedio de una persona. Es decir, no se consideraron precios de productos que presentaban valores demasiado altos o demasiado bajos para cada categoría. 
+Por otra parte, la base de datos del SEPA contiene registros con errores y *outliers* (valores extremos). Si bien estos últimos no representan, necesariamente un error, se realizó una limpieza para no distorsionar en exceso los valores reales del consumo de una persona media. Es decir, no se consideraron algunos precios de productos que presentaban valores extremos para cada categoría. Además, se trabajo con la mediana, que es menos sensible a estos casos. 
 
-Así y todo, la distribución de precios por categoría quedó de la siguiente manera:
+La distribución de precios por categoría quedó de la siguiente manera:
 
 ```{r out.width="150%"}
 boxplot <- tabla_productos %>% 
@@ -92,8 +92,6 @@ girafe(ggobj = boxplot,
 ))
 ```
 
-Se puede ver el amplio rango de precios en algunos productos como el café, así como  distribuciones más sesgadas en productos como la sal y la leche, cuyo precio promedio es  bajo pero se encuentran valores altos por la presencia de productos "gourmet" o especiales.
-
 A fines de que el usuario pueda conocer la representatividad de los datos analizados, se presenta una tabla para explorar los más de 8.500 productos contemplados en el análisis, su categorización y precio de referencia (por kilo/litro).
 
 ```{r}
@@ -112,4 +110,4 @@ datatable(rownames = F, options = list(lengthMenu = c(10, 25, 50), pageLength = 
 
 <br>
 
-En resumen, el análisis debe ser tomado a modo exploratorio. Él mismo fue realizado en el marco del concurso [Contar con datos](https://udesa.edu.ar/contar-con-datos){target="_blank"} de la Universidad de San Andrés y busca brindar una mirada territorial y accesible a una base de datos con mucho potencial de estudio y ciertos obstáculos para su procesamiento (principalmente por el tamaño y la necesidad de limpieza).
+El análisis debe ser tomado a modo exploratorio y busca brindar una mirada territorial y accesible a una base de datos con mucho potencial de estudio.
