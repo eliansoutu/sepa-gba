@@ -18,7 +18,7 @@
     "href": "index.html",
     "title": "SEPA cuánto paga",
     "section": "",
-    "text": "A continuación se analiza el precio de un conjunto de productos alimenticios en el Gran Buenos Aires (barrios de la Ciudad Autónoma de Buenos Aires y partidos de la Provincia de Buenos Aires adyacentes), a partir de datos de Precios Claros del Sistema Electrónico de Publicidad de Precios Argentinos (SEPA) publicados por la Subsecretaría de Defensa del Consumidor y Lealtad Comercial, para el mes de julio de 2025.\n¡Gracias por llegar hasta acá! Recordá visitar la sección metodológica para conocer más en detalle del análisis.\n¡Datos descargados del portal de datos abiertos del Ministerio de Economía"
+    "text": "A continuación se analiza el precio de un conjunto de productos alimenticios en el Gran Buenos Aires, a partir de datos de Precios Claros del Sistema Electrónico de Publicidad de Precios Argentinos (SEPA) publicados por la Subsecretaría de Defensa del Consumidor y Lealtad Comercial, para el mes de julio de 2025.\n¡Gracias por llegar hasta acá! Recordá visitar la sección metodológica para conocer más en detalle del análisis.\n¡Datos descargados del portal de datos abiertos del Ministerio de Economía"
   },
   {
     "objectID": "index.html#cómo-nos-alimentamos",
@@ -60,6 +60,6 @@
     "href": "index.html#qué-tanto-podemos-elegir",
     "title": "SEPA cuánto paga",
     "section": "¿Qué tanto podemos elegir?",
-    "text": "¿Qué tanto podemos elegir?\nA su vez, la oferta de productos es diversa, algo que influye en los precios analizados. A mayor variedad de productos (comercios, marcas, presentaciones), mayor variabilidad en los precios."
+    "text": "¿Qué tanto podemos elegir?\nA su vez, la oferta de productos de cada categoría es diversa, algo que influye en los precios analizados. A mayor variedad de productos (comercios, marcas, presentaciones), mayor posibilidad de elegir."
   }
 ]
