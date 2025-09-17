@@ -368,7 +368,7 @@ girafe_f(boxplot)
 
 Otras categorías, como el <b style = "color: #d6ed64;">fiambre</b>, el <b style = "color: #d6ed64;">queso</b>, la <b style = "color: #d6ed64;">leche</b> y la <b style = "color: #d6ed64;">sal fina</b>, también muestran un rango de precios amplio, justificado en la existencia de productos de distinta calidad y/o presentación. [@cr-boxplot-all]
 
-Por ejemplo, dentro de la leche podemos encontrar un sachet de 1 litro de una marca propia de un supermercado, en el extremo inferior, y una leche en polvo infantil fortificada, en el extremo superior. [@cr-boxplot-all]{scale-by="4" pan-to="40%,-70%"}
+Por ejemplo, dentro de la leche podemos encontrar un sachet de un litro de una marca propia de un supermercado, en el extremo inferior, y una leche en polvo infantil fortificada, en el extremo superior. [@cr-boxplot-all]{scale-by="4" pan-to="70%,-50%"}
 
 
 :::{#cr-boxplot-all}
@@ -378,7 +378,7 @@ boxplot <- tabla_productos %>%
   geom_boxplot_interactive(aes(categoria, precio_unificado, fill = categoria,
 tooltip = paste(categoria, "\nPrecio mínimo:", lbl_money(min),
                 "\nMediana:",lbl_money(median),
-                 "\nPrecio máximo:", lbl_money(max)))) +
+                 "\nPrecio máximo:", lbl_money(max))), show.legend = F) +
 scale_fill_manual(values = c("Leche"="#d6ed64",
 "Fiambres"="#d6ed64",
 "Queso"="#d6ed64",
