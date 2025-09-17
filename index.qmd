@@ -39,7 +39,7 @@ girafe_f <- function(plot){
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 ```
 
-A continuación se analiza el precio de un conjunto de productos alimenticios en el Gran Buenos Aires, a partir de datos de [Precios Claros del Sistema Electrónico de Publicidad de Precios Argentinos (SEPA)](https://www.preciosclaros.gob.ar/){target="_blank"} publicados por la Subsecretaría de Defensa del Consumidor y Lealtad Comercial, para el mes de julio de 2025.
+A continuación se analiza el precio de un conjunto de productos alimenticios en el Gran Buenos Aires, a partir de datos de [Precios Claros del Sistema Electrónico de Publicidad de Precios Argentinos (SEPA)](https://www.preciosclaros.gob.ar/){target="_blank"} publicados por la Secretaría de Industria y Comercio del Ministerio de Economía, para el mes de julio de 2025.
 
 ```{r}
 mapa <- total %>% 
@@ -565,5 +565,5 @@ girafe_f(mapa)
 
 <p style="font-size: large; text-align: center;">**¡Gracias por llegar hasta acá! Recordá visitar la [sección metodológica](metodologia.html) para conocer más en detalle del análisis.**</p>
 
-<p style="font-size: large; text-align: center;">**¡Datos descargados del [portal de datos abiertos del Ministerio de Economía](https://datos.gob.ar/dataset/produccion-precios-claros---base-sepa)**</p>
+<p style="font-size: large; text-align: center;">**Datos descargados del [portal de datos abiertos del Ministerio de Economía](https://datos.gob.ar/dataset/produccion-precios-claros---base-sepa), publicados por la Dirección de Evaluación y Monitoreo de Precios, Subsecretaría de Defensa del Consumidor y Lealtad Comercial, Secretaría de Industria y Comercio**</p>
 
